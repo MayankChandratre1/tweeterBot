@@ -6,4 +6,5 @@ import postTweet from './services/post.service.js';
 dotenv.config();
 
 
-startCron();
+console.log("Bot is running...");
+
