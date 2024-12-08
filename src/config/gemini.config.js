@@ -20,7 +20,7 @@ const {
     responseMimeType: "text/plain",
   };
   
-  async function generateTweet() {
+  export default async function generateTweet() {
     const chatSession = model.startChat({
       generationConfig,
       history: []

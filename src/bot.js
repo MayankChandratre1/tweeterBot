@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import generateTweet from './config/gemini.config';
 dotenv.config();
 
 const app = express();
@@ -10,7 +11,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/tweet', async (req, res) => {
-    const message = generateTweet();
+    const message = await generateTweet();
     await postTweet(message);
     console.log('Tweet posted! ' + message);
     res.send('Tweet posted!');
