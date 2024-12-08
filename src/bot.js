@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import generateTweet from './config/gemini.config';
+import generateTweet from './config/gemini.config.js';
+import postTweet from './services/post.service.js';
 dotenv.config();
 
 const app = express();
