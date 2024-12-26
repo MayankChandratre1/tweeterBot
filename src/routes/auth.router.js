@@ -16,10 +16,18 @@ authRouter.get("/login",async (req, res)=>{
         'https://tweeter-bot-orcin.vercel.app/callback',
         { scope: ["tweet.read", "users.read", "tweet.write", "offline.access"] }
       );
-      await User.create({
-        codeVerifier,
-        state
-      })
+      const user = await User.find()
+      if(user.length == 0){
+        await User.create({
+          codeVerifier,
+          state
+        })
+      }else{
+        user[0].$set({
+          codeVerifier,
+          state
+        })
+      }
       console.log(`Visit the following URL to authenticate: ${url}`);
       return res.redirect(url)
 })
