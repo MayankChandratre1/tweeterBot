@@ -49,7 +49,8 @@ app.get('/callback', async (req, res) => {
       await user[0].save()
       const { data: userObject } = await loggedClient.v2.me();
       console.log(userObject);
-      const result = await loggedClient.v2.tweet(generateTweet())
+      const tweet_text = await generateTweet()
+      const result = await loggedClient.v2.tweet(tweet_text)
       console.log("Tweet Posted", JSON.stringify(result));
       res.json({message: "Callback Recieved", success: true, url: req.url, session, state, code});
     })
