@@ -29,7 +29,7 @@ app.get('/tweet', async (req, res) => {
 app.get('/callback', async (req, res) => {
     const {state, code} = req.query
     const user = await User.find()
-    const {codeVerifier, sessionState} = user[0]
+    const {codeVerifier, state:sessionState} = user[0]
     if(!codeVerifier || !sessionState || !state){
         return res.status(401).send("Invalid request")
     }
