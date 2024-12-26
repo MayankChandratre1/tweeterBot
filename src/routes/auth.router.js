@@ -23,10 +23,11 @@ authRouter.get("/login",async (req, res)=>{
           state
         })
       }else{
-        user[0].$set({
+         user[0].$set({
           codeVerifier,
           state
         })
+        await user[0].save()
       }
       console.log(`Visit the following URL to authenticate: ${url}`);
       return res.redirect(url)
