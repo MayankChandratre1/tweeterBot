@@ -53,7 +53,11 @@ app.get('/callback', async (req, res) => {
       console.log("Tweet Posted", JSON.stringify(result));
       res.json({message: "Callback Recieved", success: true, url: req.url, session, state, code});
     })
-    .catch(() => res.status(403).send('Invalid verifier or access tokens!'));
+    .catch((error) =>{
+        console.log(error);
+        
+        res.status(403).send('Invalid verifier or access tokens!')
+    })
     
 });
 
