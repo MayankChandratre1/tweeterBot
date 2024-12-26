@@ -37,7 +37,7 @@ app.get('/callback', async (req, res) => {
         return res.status(403).send("Expired Session")
     }
 
-    client.loginWithOAuth2({ code, codeVerifier, redirectUri: CALLBACK_URL })
+    client.loginWithOAuth2({ code, codeVerifier, redirectUri: process.env.REDIRECT_URI })
     .then(async ({ client: loggedClient, accessToken, refreshToken, expiresIn }) => {
       // {loggedClient} is an authenticated client in behalf of some user
       // Store {accessToken} somewhere, it will be valid until {expiresIn} is hit.
