@@ -15,13 +15,4 @@ const client = new TwitterApi({
     clientSecret: process.env.CLIENT_SECRET,
   });
   
-  const { url, codeVerifier, state } = client.generateOAuth2AuthLink(
-    'https://oauth.pstmn.io/v1/callback',
-    { scope: ['tweet.read', 'tweet.write'] }
-  );
-  
-  console.log(`Visit the following URL to authenticate: ${url}`);
-  
-
-
 export default client;
