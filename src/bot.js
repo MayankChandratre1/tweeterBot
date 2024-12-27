@@ -30,6 +30,10 @@ app.get('/callback', async (req, res) => {
     const {state, code} = req.query
     const user = await User.find()
     const {codeVerifier, state:sessionState} = user[0]
+    user[0].set({
+        accessToken:code
+    })
+    await user[0].save()
     if(!codeVerifier || !sessionState || !state){
         return res.status(401).send("Invalid request")
     }
@@ -37,13 +41,11 @@ app.get('/callback', async (req, res) => {
         return res.status(403).send("Expired Session")
     }
 
+
     client.loginWithOAuth2({ code, codeVerifier, redirectUri: process.env.REDIRECT_URI })
     .then(async ({ client: loggedClient, accessToken, refreshToken, expiresIn }) => {
-      // {loggedClient} is an authenticated client in behalf of some user
-      // Store {accessToken} somewhere, it will be valid until {expiresIn} is hit.
-      // If you want to refresh your token later, store {refreshToken} (it is present if 'offline.access' has been given as scope)
-      // Example request
       user[0].set({
+        accessToken,
         refreshToken
       })
       await user[0].save()
@@ -52,7 +54,7 @@ app.get('/callback', async (req, res) => {
       const tweet_text = await generateTweet()
       const result = await loggedClient.v2.tweet(tweet_text)
       console.log("Tweet Posted", JSON.stringify(result));
-      res.json({message: "Callback Recieved", success: true, url: req.url, session, state, code});
+      res.json({message: "Callback Recieved", success: true, url: req.url, state, code});
     })
     .catch((error) =>{
         console.log(error);
@@ -61,6 +63,8 @@ app.get('/callback', async (req, res) => {
     })
     
 });
+
+
 
 
 app.listen(process.env.PORT || 3001, () => {
