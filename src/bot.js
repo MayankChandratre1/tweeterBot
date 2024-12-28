@@ -1,30 +1,31 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import generateTweet from './config/gemini.config.js';
-import postTweet from './services/post.service.js';
 import authRouter from "./routes/auth.router.js"
 import { connctDB } from './config/db.config.js';
-import client from './config/x.config.js';
+import client, { makeRandomTweet, TWEET_URL } from './config/x.config.js';
 import User from './model/user.model.js';
+import axios from 'axios';
+import start from "./services/cron.service.js"
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
 connctDB()
+let tweetCount = 0;
 
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
+export const incrementTweetCount = () => { tweetCount++ }
+
+app.get('/', (_, res) => {
+    res.send({
+        message:`Total Tweets made ${tweetCount}`
+    });
 });
+
 
 app.use("/auth", authRouter);
 
-app.get('/tweet', async (req, res) => {
-    const message = await generateTweet();
-    await postTweet(message);
-    console.log('Tweet posted! ' + message);
-    res.json({message: message, success: true});
-});
 
 app.get('/callback', async (req, res) => {
     const {state, code} = req.query
@@ -41,19 +42,16 @@ app.get('/callback', async (req, res) => {
         return res.status(403).send("Expired Session")
     }
 
-
     client.loginWithOAuth2({ code, codeVerifier, redirectUri: process.env.REDIRECT_URI })
     .then(async ({ client: loggedClient, accessToken, refreshToken, expiresIn }) => {
       user[0].set({
         accessToken,
-        refreshToken
+        refreshToken,
+        expiresIn
       })
       await user[0].save()
       const { data: userObject } = await loggedClient.v2.me();
       console.log(userObject);
-      const tweet_text = await generateTweet()
-      const result = await loggedClient.v2.tweet(tweet_text)
-      console.log("Tweet Posted", JSON.stringify(result));
       res.json({message: "Callback Recieved", success: true, url: req.url, state, code});
     })
     .catch((error) =>{
@@ -64,11 +62,66 @@ app.get('/callback', async (req, res) => {
     
 });
 
+app.get("/randomtweet", async (req, res)=>{
+    try{
+        const {passkey} = req.query
+        if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
+        const user = await User.find()
+        if(!user[0]){
+            return res.status(403).send("No User Found")
+        }
+        const {accessToken} = user[0]
+        const text = await generateTweet()
+        console.log(text);
+        
+        const result = await axios.post(TWEET_URL,text,{
+            headers:{
+                Authorization:`Bearer ${accessToken}`
+            }
+        })
+        res.status(200).send({
+            data: result.data
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Error occured"
+        })
+    }
+})
+
+app.post("/tweet", async (req, res)=>{
+    try{
+        const {passkey} = req.query
+        if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
+        const text = req.body
+        const user = await User.find()
+        if(!user[0]){
+            return res.status(403).send("No User Found")
+        }
+        const {accessToken} = user[0]
+        const result = await axios.post(TWEET_URL,text,{
+            headers:{
+                Authorization:`Bearer ${accessToken}`
+            }
+        })
+        res.status(200).send({
+            data: result.data
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Error occured"
+        })
+    }
+})
 
 
 
 app.listen(process.env.PORT || 3001, () => {
     console.log(`Server is running on port ${process.env.PORT || 3001}`);
+    makeRandomTweet()
+    start()
 });
 
 console.log("Bot is running...");

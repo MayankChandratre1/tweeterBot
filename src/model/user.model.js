@@ -12,6 +12,9 @@ const user_schema = new mongoose.Schema({
     },
     state:{
         type:String,
+    },
+    expiresIn:{
+        type:Number
     }
 })
 const User = mongoose.model("User",user_schema);

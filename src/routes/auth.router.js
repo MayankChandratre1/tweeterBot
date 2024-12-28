@@ -12,6 +12,8 @@ authRouter.get("/", (req, res)=>{
 })
 
 authRouter.get("/login",async (req, res)=>{
+      const {passkey} = req.query
+      if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
       const { url, codeVerifier, state } = client.generateOAuth2AuthLink(
         'https://tweeter-bot-orcin.vercel.app/callback',
         { scope: ["tweet.read", "users.read", "tweet.write", "offline.access"] }
@@ -62,6 +64,7 @@ authRouter.get('/callback', async (req, res) => {
     .catch(() => res.status(403).send('Invalid verifier or access tokens!'));
     res.json({message: "Callback Recieved", success: true, url: req.url, session, state, code});
 });
+
 
 
 
