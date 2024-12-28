@@ -60,7 +60,7 @@ app.get('/callback', async (req, res) => {
     
 });
 
-app.get("/randomtweet", async (req, res)=>{
+app.post("/randomtweet", async (req, res)=>{
     try{
         const {passkey} = req.query
         if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
