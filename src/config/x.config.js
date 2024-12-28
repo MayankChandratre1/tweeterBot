@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import User from '../model/user.model.js';
 import generateTweet from './gemini.config.js';
 import axios from 'axios';
-import { incrementTweetCount } from '../bot.js';
 dotenv.config();
 
 export const TWEET_URL = "https://api.x.com/2/tweets"
