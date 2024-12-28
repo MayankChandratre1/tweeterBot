@@ -3,7 +3,7 @@ import express from 'express';
 import generateTweet from './config/gemini.config.js';
 import authRouter from "./routes/auth.router.js"
 import { connctDB } from './config/db.config.js';
-import client, { makeRandomTweet, TWEET_URL } from './config/x.config.js';
+import client, { getTweetCount, makeRandomTweet, TWEET_URL } from './config/x.config.js';
 import User from './model/user.model.js';
 import axios from 'axios';
 import start from "./services/cron.service.js"
@@ -13,13 +13,11 @@ const app = express();
 app.use(express.json());
 
 connctDB()
-let tweetCount = 0;
 
-export const incrementTweetCount = () => { tweetCount++ }
 
 app.get('/', (_, res) => {
     res.send({
-        message:`Total Tweets made ${tweetCount}`
+        message:`Total Tweets made ${getTweetCount()}`
     });
 });
 

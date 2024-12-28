@@ -34,6 +34,11 @@ export const refreshToken = async () => {
   }
 }
 
+let tweetCount = 0;
+
+export const incrementTweetCount = () => { tweetCount++ }
+export const getTweetCount = () => tweetCount
+
 export const makeRandomTweet = async () => {
   try{
     const user = await User.find()
