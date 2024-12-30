@@ -1,6 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
-import client from "../config/x.config.js"
+import client, { refreshToken } from "../config/x.config.js"
 import User from "../model/user.model.js"
 import generateTweet from "../config/gemini.config.js"
 dotenv.config()
@@ -64,7 +64,21 @@ authRouter.get('/callback', async (req, res) => {
     .catch(() => res.status(403).send('Invalid verifier or access tokens!'));
     res.json({message: "Callback Recieved", success: true, url: req.url, session, state, code});
 });
+ 
+authRouter.post('/refresh',async (req, res)=>{
+  try{
+      const {passkey} = req.query
+      if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
+      await refreshToken()
+      res.json({
+        message:"Refreshed Your Token"
+      })
+  }catch(err){
+    console.log(err);
+    res.status(500).send("Error refreshing token")
+  }
 
+})
 
 
 
