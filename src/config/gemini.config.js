@@ -6,7 +6,7 @@ dotenv.config();
   const genAI = new GoogleGenerativeAI(apiKey);
   
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-pro",
     systemInstruction
   });
   
@@ -23,8 +23,10 @@ dotenv.config();
       generationConfig,
       history: []
     });
+
+    const variety = Math.ceil(Math.random()*9)
   
-    const result = await chatSession.sendMessage("/tweet");
+    const result = await chatSession.sendMessage(`/tweet ${variety}`);
     const res = result.response.text().replace("```json","").replace("```","")
     
     return JSON.parse(res);

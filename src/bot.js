@@ -22,6 +22,7 @@ app.get('/', (_, res) => {
 });
 
 
+
 app.use("/auth", authRouter);
 
 
@@ -113,6 +114,23 @@ app.post("/tweet", async (req, res)=>{
         })
     }
 })
+
+app.get("/generate", async (req, res)=>{
+    try{
+        const {passkey} = req.query
+        if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
+        const result = await generateTweet()
+        res.status(200).send({
+            data: result
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Error occured"
+        })
+    }
+})
+
 
 
 
