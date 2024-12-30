@@ -2,17 +2,17 @@ import dotenv from 'dotenv';
 import express from 'express';
 import generateTweet from './config/gemini.config.js';
 import authRouter from "./routes/auth.router.js"
-import { connctDB } from './config/db.config.js';
 import client, { getTweetCount, makeRandomTweet, TWEET_URL } from './config/x.config.js';
 import User from './model/user.model.js';
 import axios from 'axios';
 import start from "./services/cron.service.js"
+import { connectDBMiddleware } from './middleware/db.middleware.js';
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(connectDBMiddleware)
 
-connctDB()
 
 
 app.get('/', (_, res) => {
