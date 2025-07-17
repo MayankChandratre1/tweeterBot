@@ -115,6 +115,32 @@ app.post("/tweet", async (req, res)=>{
     }
 })
 
+app.post("/tweet/:id", async (req, res)=>{
+    try{
+        const {passkey} = req.query
+        if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
+        const text = await generateTweet(req.params.id)
+        const user = await User.find()
+        if(!user[0]){
+            return res.status(403).send("No User Found")
+        }
+        const {accessToken} = user[0]
+        const result = await axios.post(TWEET_URL,text,{
+            headers:{
+                Authorization:`Bearer ${accessToken}`
+            }
+        })
+        res.status(200).send({
+            data: result.data
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Error occured"
+        })
+    }
+})
+
 app.get("/generate", async (req, res)=>{
     try{
         const {passkey} = req.query
