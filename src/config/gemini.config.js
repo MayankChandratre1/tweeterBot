@@ -26,7 +26,7 @@ dotenv.config();
 
     const variety = id || Math.ceil(Math.random()*9)
   
-    const result = await chatSession.sendMessage(`/tweet ${variety}`);
+    const result = await chatSession.sendMessage(`/tweet`);
     const res = result.response.text().replace("```json","").replace("```","")
     
     return JSON.parse(res);
