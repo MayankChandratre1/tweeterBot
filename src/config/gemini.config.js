@@ -57,9 +57,7 @@ export default async function generateTweet(id) {
   const n = Math.ceil(Math.random() * 1000);
   if(n == 7 || n == 17 || n == 27 || n == 37 || n == 47 || n == 57 || n == 67 || n == 77 || n == 87 || n == 97){
     console.log("Generating a poll...");
-    return {
-      text: "He's my father: @chandratrem91"
-    }
+    res =  "{\"text\": \"He's my father: @chandratrem91\"}"
   }
 
 
