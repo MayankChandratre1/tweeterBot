@@ -78,6 +78,8 @@ app.post("/randomtweet", async (req, res)=>{
                 Authorization:`Bearer ${accessToken}`
             }
         })
+
+        
         res.status(200).send({
             data: result.data
         })
@@ -162,8 +164,8 @@ app.get("/generate", async (req, res)=>{
 
 app.listen(process.env.PORT || 3001, () => {
     console.log(`Server is running on port ${process.env.PORT || 3001}`);
-    makeRandomTweet()
-    start()
+    // makeRandomTweet()
+    // start()
 });
 
 console.log("Bot is running...");

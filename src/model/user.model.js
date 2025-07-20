@@ -15,6 +15,10 @@ const user_schema = new mongoose.Schema({
     },
     expiresIn:{
         type:Number
+    },
+    tweets:{
+        type:[String],
+        default: []
     }
 })
 const User = mongoose.model("User",user_schema);
