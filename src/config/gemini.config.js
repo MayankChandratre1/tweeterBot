@@ -11,6 +11,7 @@ You only respond to the prompt '/tweet' which returns a response in this format:
 Response format:
 if it's only a text tweet: {
   "text":"your response with double and single quotes replaced with escaped double quotes"
+  "isSoftware": true/false // if the tweet is related to software or not
 }
 if it's a poll: {
   "text":"[poll caption without options]",
@@ -18,6 +19,7 @@ if it's a poll: {
     "options":["[option1]", "[option2]", ...],
     "duration_minutes":720
   }
+  "isSoftware": true/false // if the tweet is related to software or not
 }`;
 const genAI = new GoogleGenerativeAI(apiKey);
 

@@ -64,15 +64,65 @@ app.get('/callback', async (req, res) => {
 app.post("/randomtweet", async (req, res)=>{
     try{
         const {passkey} = req.query
+        // Community IDs from comm.json
+const communityIds = [
+  "1699807431709041070",
+  "1890436071542190579",
+  "1875284937727000987",
+  "1670465414223085569",
+  "1805361872448672165",
+  "1670293119277973507",
+  "1877144599015338394"
+];
         if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
         const user = await User.find()
         if(!user[0]){
             return res.status(403).send("No User Found")
         }
         const {accessToken} = user[0]
-        const text = await generateTweet()
+        let text = await generateTweet()
         console.log(text);
-        
+        if(text.isSoftware){
+            const randomCommunityId = communityIds[Math.floor(Math.random() * communityIds.length)];
+            const postInCommunity = Math.random() < 0.7; // 70% chance to post in a community
+            if (postInCommunity) {
+                console.log("Posting in a community...");
+                 text = text.poll ?{
+                text: text.text,
+                community_id: randomCommunityId,
+                poll: {
+                    options: text.poll.options,
+                    duration_minutes: text.poll.duration_minutes
+                }
+            }:{
+                text: text.text,
+                community_id: randomCommunityId
+            }
+            } else {
+                console.log("Posting in the user's timeline...");
+                 text = text.poll ?{
+                text: text.text,
+                poll: {
+                    options: text.poll.options,
+                    duration_minutes: text.poll.duration_minutes
+                }
+            }:{
+                text: text.text,
+            }
+            }
+           
+        }else{
+            console.log("Posting in the user's timeline...");
+            text = text.poll ?{
+                text: text.text,
+                poll: {
+                    options: text.poll.options,
+                    duration_minutes: text.poll.duration_minutes
+                }
+            }:{
+                text: text.text,
+            }
+        }
         const result = await axios.post(TWEET_URL,text,{
             headers:{
                 Authorization:`Bearer ${accessToken}`
@@ -81,7 +131,8 @@ app.post("/randomtweet", async (req, res)=>{
 
         
         res.status(200).send({
-            data: result.data
+            text,
+            data: result.data,
         })
     }catch(err){
         console.log(err);
@@ -106,6 +157,41 @@ app.post("/tweet", async (req, res)=>{
                 Authorization:`Bearer ${accessToken}`
             }
         })
+        res.status(200).send({
+            data: result.data
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            message:"Error occured"
+        })
+    }
+})
+
+app.post("/my/tweet", async (req, res)=>{
+    try{
+        const {passkey} = req.query
+        if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
+        const user = await User.find()
+        if(!user[0]){
+            return res.status(403).send("No User Found")
+        }
+        const {accessToken} = user[0]
+        const result = await axios.get(`https://api.x.com/2/communities/search?query=software`,{
+            headers:{
+                Authorization:`Bearer ${accessToken}`
+            }
+        })
+        // const result = await axios.get(`https://api.x.com/2/users/1865778885759229952/following`,{
+        //     headers:{
+        //         Authorization:`Bearer ${accessToken}`
+        //     }
+        // })
+        // const result = await axios.get(`https://api.x.com/2/users/1865778885759229952/tweets`,{
+        //     headers:{
+        //         Authorization:`Bearer ${accessToken}`
+        //     }
+        // })
         res.status(200).send({
             data: result.data
         })

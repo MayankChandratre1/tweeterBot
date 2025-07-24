@@ -16,7 +16,7 @@ authRouter.get("/login",async (req, res)=>{
       if(passkey !== process.env.PASS_KEY) return res.status(403).send("Unauthorized: Wrong Pass Key")
       const { url, codeVerifier, state } = client.generateOAuth2AuthLink(
         'https://tweeter-bot-orcin.vercel.app/callback',
-        { scope: ["tweet.read", "users.read", "tweet.write", "offline.access"] }
+        { scope: ["tweet.read", "users.read", "tweet.write", "offline.access","follows.read","follows.write","media.write"] }
       );
       const user = await User.find()
       if(user.length == 0){
